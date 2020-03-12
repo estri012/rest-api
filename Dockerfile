@@ -1,8 +1,15 @@
-FROM python:3
+FROM python:3.7
+#set workdir
+WORKDIR /usr/src/gmlews
+#set env
+ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONBUFFERED 1
-RUN mkdir /code
-WORKDIR /code
-ADD requirements.txt /code/
+#install dependencies
+RUN pip install --upgrade pip
+COPY ./requirements.txt /usr/src/gmlews/requirements.txt
 RUN pip install -r requirements.txt
-ADD . /code/
+#copy project
+COPY . /usr/src/gmlews
+
+
 
