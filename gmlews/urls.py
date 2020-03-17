@@ -15,16 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from restapi import views
 
 from django.contrib.auth.models import User
 from restapi.models import Data, Node
 from rest_framework import routers
 
-from restapi.views import UserViewSet, DataViewSet, NodeViewSet
+from restapi.views import DataViewSet, NodeViewSet, Charts
 
 
 router = routers.DefaultRouter()
-router.register(r'api/users', UserViewSet)
 
 router.register(r'api/data', DataViewSet)
 
@@ -34,5 +34,6 @@ router.register(r'api/node', NodeViewSet)
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(r'', include(router.urls)),
-    path(r'api/', include('rest_framework.urls', namespace='rest_framework'))
+    path(r'api/', include('rest_framework.urls', namespace='rest_framework')),
+    path('charts/', Charts.as_view(), name='charts'),
 ]

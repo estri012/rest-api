@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+import json
 
 # Create your models here.
 class Data(models.Model):
@@ -17,9 +17,9 @@ class Data(models.Model):
     accelero_z = models.FloatField()
     displacement = models.IntegerField()
 
-    def __str__(self):
-        return self.node_id
-
 
 class Node(models.Model):
     node_id = models.IntegerField()
+
+
+
