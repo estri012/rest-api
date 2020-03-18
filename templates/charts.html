@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
 
-    <title>Weather Update</title>
+    <title>Try Chart</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
 
@@ -11,8 +11,6 @@
     <script>
 
     function dspChrt(hum, vibrate) {
-        hum = loadChart().hum;
-        vibrate = loadChart().vibrate;
 
     var ctx = document.getElementById('myChart').getContext('2d');
     var myChart = new Chart(ctx, {
@@ -24,7 +22,7 @@
       data: hum, // json value received used in method
       backgroundColor: "rgba(153,255,51,0.4)"
     }, {
-      label: 'Getaran',
+      label: 'Vibration',
       data: vibrate,
       backgroundColor: "rgba(255,153,0,0.4)"
     }]
@@ -38,7 +36,7 @@
 
  function loadChart()
  {
-    var data, hum, vibrate;
+    var data, hum = [], vibrate = [];
 
     var requestURL = 'http://127.0.0.1:8000/api/data'; //URL of the JSON data
     var request = new XMLHttpRequest({mozSystem: true}); // create http request
@@ -47,13 +45,13 @@
      if(request.readyState == 4 && request.status == 200) {
         data = JSON.parse(request.responseText);
         for (var i=0; i<data.length;i++) {
-            hum = data[i].moisture;
-            vibrate = data[i].vibration;
+            hum.push(data[i].moisture);
+            vibrate.push(data[i].vibration);
         }
-        console.log('hum', hum);
+        /* console.log('hum', hum);
         console.log('vibrate', vibrate);
-        console.log('data', data);
-        return data,hum,vibrate;
+        console.log('data', data); */
+        
         dspChrt(hum, vibrate);   
          
   }
@@ -62,7 +60,7 @@
     request.send(); // send the request
 
  }
-
+loadChart();
 </script>
 
 
@@ -73,7 +71,7 @@
 
   <div class="container">
 
-  <h2>Weather Update</h2>
+  <h2>Try Chart</h2>
 
   <div>
     <canvas id="myChart"></canvas>
