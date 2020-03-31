@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <!-- leaflet css -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+        integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+        crossorigin=""/>
+        <!--leaflet js after leaflet css-->
+        <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+        integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+        crossorigin=""></script>
+        <title>Fetch JSON from API</title>
+    </head>
+    <body>
+        <h1>Letak Node 1</h1>
+
+        <p>
+            latitude: <span id="lat"></span><br />
+            longitude: <span id="lon"></span>
+        </p>
+        <style>
+            #node1Map { height: 260px; }
+          </style>
+          <div id="node1Map"></div>
+        <script>
+        const mymap = L.map('node1Map').setView([0, 0], 1);
+        const attribution ='&copy: <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+        const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const tiles = L.tileLayer(tileUrl, { attribution });
+        tiles.addTo(mymap);
+
+            var latitude;
+            var longitude;
+            const api_url = '/api/map'
+            async function getData(){
+                const response = await fetch(api_url);
+                const data = await response.json();
+                data.forEach(function(item){
+                    latitude = item.gps_latitude;
+                    longitude = item.gps_longitude;
+                    console.log(latitude);
+                    console.log(longitude);
+                });
+
+                L.marker([latitude, longitude]).addTo(mymap);
+
+                document.getElementById('lat').textContent = latitude;
+                document.getElementById('lon').textContent = longitude;
+                
+            }
+            getData();
+        </script>
+    </body>
+</html>

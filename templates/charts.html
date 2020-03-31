@@ -10,22 +10,42 @@
 
     <script>
 
-    function dspChrt(hum, vibrate) {
+    function dspChrt(hum, time) {
 
     var ctx = document.getElementById('myChart').getContext('2d');
     var myChart = new Chart(ctx, {
     type: 'line',
     data: {
-    labels: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+    labels: time,
     datasets: [{
       label: 'Humidity',
       data: hum, // json value received used in method
-      backgroundColor: "rgba(153,255,51,0.4)"
-    }, {
-      label: 'Vibration',
-      data: vibrate,
-      backgroundColor: "rgba(255,153,0,0.4)"
+      backgroundColor: ["rgba(153,255,51,0.4)"],
+      borderColor: ["#808080"],
+      borderWidth: 1
     }]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      yAxes: [{
+        ticks: {
+          suggestedMin : 0,
+          suggestedMax : 100,
+          stepSize: 10,
+        },
+        scaleLabel: {
+          display: true,
+          labelString: 'Humidity (%)'
+        }
+      }],
+      xAxes: [{
+        scaleLabel: {
+          display: true,
+          labelString: 'Date Time'
+        }
+      }]
+    }
   }
 });
 }
@@ -36,7 +56,7 @@
 
  function loadChart()
  {
-    var data, hum = [], vibrate = [];
+    var data, hum = [], time = [];
 
     var requestURL = 'http://127.0.0.1:8000/api/data'; //URL of the JSON data
     var request = new XMLHttpRequest({mozSystem: true}); // create http request
@@ -46,14 +66,13 @@
         data = JSON.parse(request.responseText);
         for (var i=0; i<data.length;i++) {
             hum.push(data[i].moisture);
-            vibrate.push(data[i].vibration);
+            time.push(data[i].timestamp);
         }
-        /* console.log('hum', hum);
-        console.log('vibrate', vibrate);
-        console.log('data', data); */
+        console.log(hum);
+        console.log(time);
+        console.log(data);
         
-        dspChrt(hum, vibrate);   
-         
+        dspChrt(hum, time);   
   }
 }
     request.open('GET', requestURL);

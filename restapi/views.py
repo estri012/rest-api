@@ -15,11 +15,21 @@ class Charts(View):
         return render(request, 'charts.html')
 
 
+class Map(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'map.html')
+
+
 class DataViewSet(viewsets.ModelViewSet):
         queryset = Data.objects.all()
         serializer_class = DataSerializer
         filter_backends = [DjangoFilterBackend]
         filterset_fields = ['node_id']
+
+
+class MapView(viewsets.ModelViewSet):
+        queryset = Data.objects.filter(node_id=1).order_by('-id')[:1]
+        serializer_class = DataSerializer
 
 
 class NodeViewSet(viewsets.ModelViewSet):
