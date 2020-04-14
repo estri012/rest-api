@@ -4,100 +4,149 @@
     <meta charset="utf-8">
 
     <title>Try Chart</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+    
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 
 
-    <script>
-
-    function dspChrt(hum, time) {
-
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-    labels: time,
-    datasets: [{
-      label: 'Humidity',
-      data: hum, // json value received used in method
-      backgroundColor: ["rgba(153,255,51,0.4)"],
-      borderColor: ["#808080"],
-      borderWidth: 1
-    }]
-  },
-  options: {
-    responsive: true,
-    scales: {
-      yAxes: [{
-        ticks: {
-          suggestedMin : 0,
-          suggestedMax : 100,
-          stepSize: 10,
-        },
-        scaleLabel: {
-          display: true,
-          labelString: 'Humidity (%)'
-        }
-      }],
-      xAxes: [{
-        scaleLabel: {
-          display: true,
-          labelString: 'Date Time'
-        }
-      }]
-    }
-  }
-});
-}
-    </script>
+    
 
 <script>
- var myVar = setInterval(loadChart, 60000); // updates chart every one minute
+$(document).ready(function(){
+    $.datepicker.setDefaults({
+        dateFormat: 'yy-mm-dd'
+      });
+      $("#firstdatepicker").datepicker();
+      $("#lastdatepicker").datepicker();
+      $("#filter").click(function() {
+        var from_date = $("#firstdatepicker").val();
+        var to_date = $("#lastdatepicker").val();
+        if (from_date != '' && to_date != '') {
+          console.log(from_date, to_date);
+          var endpoint = '/api/data';
 
- function loadChart()
- {
-    var data, hum = [], time = [];
-
-    var requestURL = 'http://127.0.0.1:8000/api/data'; //URL of the JSON data
-    var request = new XMLHttpRequest({mozSystem: true}); // create http request
-
-    request.onreadystatechange = function() {
-     if(request.readyState == 4 && request.status == 200) {
-        data = JSON.parse(request.responseText);
-        for (var i=0; i<data.length;i++) {
+      $.ajax({
+        method: "GET",
+        url: endpoint,
+        data: {
+          from_date: from_date,
+          to_date: to_date
+        },
+        success: function(data){
+          console.log(data); //get all data
+          //get data by fields
+          var hum = [], time = [];
+          for (var i=0; i<data.length; i++){
             hum.push(data[i].moisture);
             time.push(data[i].timestamp);
+         }
+          console.log(hum);
+          console.log(time);
+        //plot the chart
+          
+          var ctx = document.getElementById("moistureChart").getContext('2d');
+          var moistureChart = new Chart(ctx, {
+              type: 'line',
+              data: {
+                  labels: time,
+                  datasets: [{
+                      label: 'kelembaban',
+                      data: hum,
+                      backgroundColor: [
+                          '#ff000000'
+                      ],
+                      borderColor: [
+                      '#331698'
+                      ],
+                      borderCapStyle: 'round',
+                      borderWidth: 1
+                  }]
+              },
+              options: {
+                  reponsive: true,
+                  scales: {
+                      yAxes: [{
+                          ticks: {
+                              beginAtZero:false,
+                              stepSize:10
+                          },
+                            scaleLabel: {
+                            display:     true,
+                            labelString: 'kelembaban'
+                        }
+                      }],
+                      xAxes: [{
+                       
+                              display: true,
+                              type: "time",
+                              time: {
+                                    minUnit: "hour",
+                                    unit: "hour",
+                                    unitStepSize: 6,
+                                    min: moment(from_date).toDate(),//Date object type
+                                    max: moment(to_date).toDate()//Date object type
+                              },
+                            scaleLabel: {
+                            display:     true,
+                            labelString: 'Time'
+                        }
+                      }]
+                  }
+              }
+          });
+        },
+        error: function(error_data){
+          console.log(error_data)
         }
-        console.log(hum);
-        console.log(time);
-        console.log(data);
-        
-        dspChrt(hum, time);   
-  }
-}
-    request.open('GET', requestURL);
-    request.send(); // send the request
-
- }
-loadChart();
+      });
+    } else {
+      alert("Please Select Date");
+    }
+      });    
+});
 </script>
 
 
   </head>
 
 
-  <body onload="loadChart()">
+  <body>
+    <div class="container-fluid">
+      <!--Breadcrumbs-->
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+        </li>
+        <li class="breadcrumb-item active">Charts</li>
+        <li style="margin-left: 10px">
+        data from <input type="text" id="firstdatepicker" name="firstdatepicker" value="2020-03-14">
+        to <input type="text" id="lastdatepicker" name="lastdatepicker" value="2020-03-15">
+        <input type="button" name="filter" id="filter" value="Filter" class="btn btn-info">
+      </li>
+      </ol>
+        <div class="row"> 
+          <div class="col-sm-1"></div>
+            <canvas id="moistureChart" width="722" height="400">
+            </canvas>
+            <div class="col-sm-1"></div>
+        </div>
+    </div>
 
-  <div class="container">
-
-  <h2>Try Chart</h2>
-
-  <div>
-    <canvas id="myChart"></canvas>
-  </div>
-
-  </div>
 
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/jquery.ui.datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+  <!--buat kalender-->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/themes/sunny/jquery-ui.min.css"></link>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css"></link>
+    
   </body>
 </html>
