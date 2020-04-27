@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
-
+    
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.3/jspdf.min.js"></script>
   -->       
@@ -110,106 +110,12 @@ $(document).ready(function(){
 
 </script>
 
-<script>
-  $(document).ready(function(){
-      $.datepicker.setDefaults({
-          dateFormat: 'yy-mm-dd'
-        });
-        $("#firstdatepicker2").datepicker();
-        $("#lastdatepicker2").datepicker();
-        $("#filter2").click(function() {
-          var from_date = $("#firstdatepicker2").val();
-          var to_date = $("#lastdatepicker2").val();
-          if (from_date != '' && to_date != '') {
-            console.log(from_date, to_date);
-            var endpoint = '/api/data';
-  
-        $.ajax({
-          method: "GET",
-          url: endpoint,
-          data: {
-            from_date: from_date,
-            to_date: to_date
-          },
-          success: function(data){
-            console.log(data); //get all data
-            //get data by fields
-            var vibrate = [], time = [];
-            for (var i=0; i<data.length; i++){
-              vibrate.push(data[i].vibration);
-              time.push(data[i].timestamp);
-           }
-            console.log(vibrate);
-           
-          //plot the chart
-            
-            var ctx = document.getElementById("vibrationChart").getContext('2d');
-            var vibrationChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: time,
-                    datasets: [{
-                        label: 'getaran',
-                        data: vibrate,
-                        backgroundColor: [
-                            '#ff000000'
-                        ],
-                        borderColor: [
-                        '#331698'
-                        ],
-                        borderCapStyle: 'round',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    reponsive: true,
-                    scales: {
-                        yAxes: [{
-                            ticks: {
-                                beginAtZero:false,
-                                stepSize:10
-                            },
-                              scaleLabel: {
-                              display:     true,
-                              labelString: 'getaran'
-                          }
-                        }],
-                        xAxes: [{
-                         
-                                display: true,
-                                type: "time",
-                                time: {
-                                      minUnit: "hour",
-                                      unit: "hour",
-                                      unitStepSize: 6,
-                                      min: moment(from_date).toDate(),//Date object type
-                                      max: moment(to_date).toDate()//Date object type
-                                },
-                              scaleLabel: {
-                              display:     true,
-                              labelString: 'Time'
-                          }
-                        }]
-                    }
-                }
-            });
-          },
-          error: function(error_data){
-            console.log(error_data)
-          }
-        });
-      } else {
-        alert("Please Select Date");
-      }
-        });    
-  });
-  
-  </script>
 
   </head>
 
 
   <body>
+
     <div class="container-fluid">
       <!--Breadcrumbs-->
       <ol class="breadcrumb">
@@ -227,27 +133,7 @@ $(document).ready(function(){
             <canvas id="moistureChart" width="600" height="400">
             </canvas>
             <div class="col-sm-1"></div>
-            <br>
-            <h1>Chart2</h1>
-            <br>
-<!--Breadcrumbs-->
-<ol class="breadcrumb">
-  <li class="breadcrumb-item">
-  </li>
-  <li class="breadcrumb-item active">Charts</li>
-  <li style="margin-left: 10px">
-  data from <input type="text" id="firstdatepicker2" name="firstdatepicker2" value="2020-03-14">
-  to <input type="text" id="lastdatepicker2" name="lastdatepicker2" value="2020-03-15">
-  <input type="button" name="filter2" id="filter2" value="Filter" class="btn btn-info">
-</li>
-</ol>
-  <div class="row"> 
-    <div class="col-sm-1"></div>
-      <canvas id="vibrationChart" width="600" height="400">
-      </canvas>
-      <div class="col-sm-1"></div>
-        </div>
-    </div>
+
 
 
 
