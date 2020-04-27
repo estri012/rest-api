@@ -21,7 +21,7 @@ from django.contrib.auth.models import User
 from restapi.models import Data, Node
 from rest_framework import routers
 
-from restapi.views import DataViewSet, MapView, NodeViewSet, Charts, Map
+from restapi.views import DataViewSet, MapView, NodeViewSet, Charts, Map, ChartsDua
 
 
 router = routers.DefaultRouter()
@@ -38,6 +38,7 @@ urlpatterns = [
     path(r'api/', include(router.urls)),
     path(r'', include('rest_framework.urls', namespace='rest_framework')),
     path('charts/', Charts.as_view(), name='charts'),
+    path('charts2/', ChartsDua.as_view(), name='charts2'),
     path('map/', Map.as_view(), name='map'),
 
 ]

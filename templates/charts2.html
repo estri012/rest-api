@@ -115,11 +115,11 @@ $(document).ready(function(){
       $.datepicker.setDefaults({
           dateFormat: 'yy-mm-dd'
         });
-        $("#firstdatepicker2").datepicker();
-        $("#lastdatepicker2").datepicker();
-        $("#filter2").click(function() {
-          var from_date = $("#firstdatepicker2").val();
-          var to_date = $("#lastdatepicker2").val();
+        $("#firstdatepicker").datepicker();
+        $("#lastdatepicker").datepicker();
+        $("#filter").click(function() {
+          var from_date = $("#firstdatepicker").val();
+          var to_date = $("#lastdatepicker").val();
           if (from_date != '' && to_date != '') {
             console.log(from_date, to_date);
             var endpoint = '/api/data';
@@ -230,17 +230,7 @@ $(document).ready(function(){
             <br>
             <h1>Chart2</h1>
             <br>
-<!--Breadcrumbs-->
-<ol class="breadcrumb">
-  <li class="breadcrumb-item">
-  </li>
-  <li class="breadcrumb-item active">Charts</li>
-  <li style="margin-left: 10px">
-  data from <input type="text" id="firstdatepicker2" name="firstdatepicker2" value="2020-03-14">
-  to <input type="text" id="lastdatepicker2" name="lastdatepicker2" value="2020-03-15">
-  <input type="button" name="filter2" id="filter2" value="Filter" class="btn btn-info">
-</li>
-</ol>
+
   <div class="row"> 
     <div class="col-sm-1"></div>
       <canvas id="vibrationChart" width="600" height="400">

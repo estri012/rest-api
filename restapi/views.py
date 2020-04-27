@@ -14,6 +14,10 @@ class Charts(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'charts.html')
 
+class ChartsDua(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'charts2.html')
+
 
 class Map(View):
     def get(self, request, *args, **kwargs):
