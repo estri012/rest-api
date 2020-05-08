@@ -21,16 +21,18 @@ from django.contrib.auth.models import User
 from restapi.models import Data, Node
 from rest_framework import routers
 
-from restapi.views import DataViewSet, MapView, NodeViewSet, Charts, Map, ChartsDua
+from restapi.views import DataViewSet, MapView, NodeViewSet, Charts, Map, ChartsDua, AcceleroXViewSet, ChartNode
 
 
 router = routers.DefaultRouter()
 
-router.register(r'data', DataViewSet)
+router.register(r'data', DataViewSet, 'data')
 
-router.register(r'node', NodeViewSet)
+router.register(r'node', NodeViewSet, 'node')
 
-router.register(r'map', MapView)
+router.register(r'map', MapView, 'map')
+
+router.register(r'accelerox', AcceleroXViewSet, 'accelerox')
 
 
 urlpatterns = [
@@ -39,6 +41,7 @@ urlpatterns = [
     path(r'', include('rest_framework.urls', namespace='rest_framework')),
     path('charts/', Charts.as_view(), name='charts'),
     path('charts2/', ChartsDua.as_view(), name='charts2'),
+    path('chartnode/', ChartNode.as_view(), name='chartnode'),
     path('map/', Map.as_view(), name='map'),
 
 ]

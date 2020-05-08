@@ -12,3 +12,8 @@ class NodeSerializer(serializers.ModelSerializer):
     class Meta :
         model = Node
         fields = '__all__'
+
+class AcceleroXSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Data
+        fields = ['timestamp', 'accelero_x']

@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!--javascript core for charts-->  
+<script src="https://code.jquery.com/jquery-1.7.1.min.js" integrity="sha256-iBcUE/x23aI6syuqF7EeT/+JFBxjPs5zeFJEXxumwb0=" crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
+<script src="http://code.highcharts.com/stock/highstock.js"></script>
+<script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" />
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+          <!-- Page Heading -->
+<div class="d-sm-flex align-items-center justify-content-between mb-4">
+  <h1 class="h3 mb-0 text-gray-800">Sensor Node 1</h1>
+</div>
+          <!--Accelero X card header-->
+          <div class="card-header">
+            <h6 class="m-0 font-weight-bold text-primary">Percepatan Gerak Tanah Pada Sumbu X</h6>
+        <!--Accelero X Area Chart-->
+      <div class="card-body">
+          <div class="chart-area">
+            <div id="container" ></div>
+          </div>
+      </div> <!--end of area chart-->
+    </div> <!--end of Acc X card header-->
+      <br>
+      <br>
+      <br>
+      <!--Accelero Y card header-->
+      <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Percepatan Gerak Tanah Pada Sumbu Y</h6>
+      <!--Accelero Y Area Chart-->
+      <div class="card-body">
+        <div class="chart-area">
+          <div id="container4" ></div>
+        </div>
+    </div> <!--end of area chart-->
+          </div> <!--end of Acc Y card header-->
+          <br>
+          <br>
+          <br>
+          <!--Accelero Z card header-->
+      <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Percepatan Gerak Tanah Pada Sumbu Z</h6>
+      <!--Accelero Z Area Chart-->
+      <div class="card-body">
+        <div class="chart-area">
+          <div id="container5" ></div>
+        </div>
+    </div> <!--end of area chart-->
+          </div> <!--end of Acc Z card header-->
+          <br>
+          <br>
+          <br>
+          <!--Gyro X card header-->
+      <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Kemiringan Tanah Pada Sumbu X</h6>
+      <!--Gyro X Area Chart-->
+      <div class="card-body">
+        <div class="chart-area">
+          <div id="container6" ></div>
+        </div>
+    </div> <!--end of area chart-->
+          </div> <!--end of Gyro X card header-->
+          <br>
+          <br>
+          <br>
+          <!--Gyro Y card header-->
+      <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Kemiringan Tanah Pada Sumbu Y</h6>
+      <!--Gyro Y Area Chart-->
+      <div class="card-body">
+        <div class="chart-area">
+          <div id="container7" ></div>
+        </div>
+    </div> <!--end of area chart-->
+          </div> <!--end of Gyro Y card header-->
+          <br>
+          <br>
+          <br>
+          <!--Gyro Z card header-->
+      <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Kemiringan Tanah Pada Sumbu Z</h6>
+      <!--Gyro Z Area Chart-->
+      <div class="card-body">
+        <div class="chart-area">
+          <div id="container8" ></div>
+        </div>
+    </div> <!--end of area chart-->
+          </div> <!--end of Gyro Z card header-->
+          <br>
+          <br>
+          <br>
+          <!--Vibration card header-->
+      <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Getaran Tanah</h6>
+      <!--Vibration Area Chart-->
+      <div class="card-body">
+        <div class="chart-area">
+          <div id="container2" ></div>
+        </div>
+    </div> <!--end of area chart-->
+          </div> <!--end of Vibration card header-->
+          <br>
+          <br>
+          <br>
+          <!--Moisture card header-->
+      <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Kelembaban Tanah</h6>
+      <!--Moisture Area Chart-->
+      <div class="card-body">
+        <div class="chart-area">
+          <div id="container3" ></div>
+        </div>
+    </div> <!--end of area chart-->
+          </div> <!--end of Moisture card header-->
+          <br>
+          <br>
+          <br>
+          <!--Displacement card header-->
+      <div class="card-header">
+        <h6 class="m-0 font-weight-bold text-primary">Patahan/Perpindahan Tanah</h6>
+      <!--Displacement Area Chart-->
+      <div class="card-body">
+        <div class="chart-area">
+          <div id="container9" ></div>
+        </div>
+    </div> <!--end of area chart-->
+          </div> <!--end of Displacement card header-->
+          <br>
+          <br>
+          <br>
+      
+
+
+
+
+        </div>
+        <!--end of page content (container-fluid) -->
+
+      </div>
+      <!-- End of Main Content -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+
+  <!-- Page level charts yang digunakan halaman ini-->
+  <script src="{% static 'js/demo/accelerox_n1.js' %}"></script>
+  <script src="{% static 'js/demo/acceleroy_n1.js' %}"></script>
+  <script src="{% static 'js/demo/acceleroz_n1.js' %}"></script>
+  <script src="{% static 'js/demo/gyrox_n1.js' %}"></script>
+  <script src="{% static 'js/demo/gyroy_n1.js' %}"></script>
+  <script src="{% static 'js/demo/gyroz_n1.js' %}"></script>
+  <script src="{% static 'js/demo/vibration_n1.js' %}"></script>
+  <script src="{% static 'js/demo/displacement_n1.js' %}"></script>
+  <script src="{% static 'js/demo/moisture_n1.js' %}"></script>
+
+
+  {% endblock content %}
