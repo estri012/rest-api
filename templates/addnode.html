@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<style>
+    #id_email{
+        width:30%
+    }
+
+    #id_penanggung_jawab_pemasangan{
+        width:30%
+    }
+</style>
+
+<div class="container">
+    <h2>Permintaan Menambahkan Node Baru</h2>
+    <p>Petunjuk! Masukkan informasi node berupa:<br>
+    username dan email anda, lokasi, nama penanggung jawab(PJ), kontak PJ, tanggal pemasangan node, serta data sensor yang bekerja pada node<br>
+    Admin akan mengirim email saat penambahan node baru sudah siap.</p>
+    <form action="" method="POST">
+        {% csrf_token %}
+        
+        {% for field in form.visible_fields %}
+        <div class="form-group">
+            {{ field.errors}}
+            <label>{{ field.label_tag}}</label>
+            <p>{{ field }}</p>
+        </div>
+        {% endfor %}
+        <button type="reset" class="btn btn-secondary">Reset</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+
+{% endblock content %}

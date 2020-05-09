@@ -43,5 +43,6 @@ urlpatterns = [
     path('charts2/', ChartsDua.as_view(), name='charts2'),
     path('chartnode/', ChartNode.as_view(), name='chartnode'),
     path('map/', Map.as_view(), name='map'),
+    path('addnode/', views.add_node, name='add-node')
 
 ]
