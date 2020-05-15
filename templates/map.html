@@ -111,7 +111,9 @@
           //marker
           for (let i=0; i<coordinates.length; i++) {
             L.marker(coordinates[i]).addTo(map)
-            .bindPopup("<b>Latitude:</b> " + coordinates[i][0] +"</br>" + "<b>Longitude:</b> " + coordinates[i][1] + "</br>" + "<b>Node Id:</b> " + node_id[i]);
+            .bindPopup("<b>Latitude:</b> " + coordinates[i][0] +"</br>" + 
+            "<b>Longitude:</b> " + coordinates[i][1] + "</br>" + 
+            "<b>Node Id:</b> " + node_id[i]);
           };
           
         };
