@@ -18,10 +18,10 @@ from django.urls import path, include
 from restapi import views
 
 from django.contrib.auth.models import User
-from restapi.models import Data, Node
+from restapi.models import Data, Node, Post
 from rest_framework import routers
 
-from restapi.views import DataViewSet, MapView, NodeViewSet, Charts, Map, ChartsDua, AcceleroXViewSet, ChartNode
+from restapi.views import DataViewSet, MapView, NodeViewSet, Charts, Map, ChartsDua, AcceleroXViewSet, ChartNode, TambahNode, PostViewSet
 
 
 router = routers.DefaultRouter()
@@ -34,6 +34,8 @@ router.register(r'map', MapView, 'map')
 
 router.register(r'accelerox', AcceleroXViewSet, 'accelerox')
 
+router.register(r'post', PostViewSet, 'post')
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -43,6 +45,7 @@ urlpatterns = [
     path('charts2/', ChartsDua.as_view(), name='charts2'),
     path('chartnode/', ChartNode.as_view(), name='chartnode'),
     path('map/', Map.as_view(), name='map'),
-    path('addnode/', views.add_node, name='add-node')
+    path('addnode/', views.add_node, name='add-node'),
+    path('node/', TambahNode.as_view(), name='tambahnode'),
 
 ]

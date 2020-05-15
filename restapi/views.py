@@ -3,8 +3,8 @@ from django.views.generic import View
 from django.shortcuts import render
 from rest_framework import routers, serializers, viewsets
 from rest_framework.response import Response
-from restapi.serializers import DataSerializer, NodeSerializer, AcceleroXSerializer
-from restapi.models import Data, Node
+from restapi.serializers import DataSerializer, NodeSerializer, AcceleroXSerializer, PostSerializer
+from restapi.models import Data, Node, Post
 from django_filters.rest_framework import DjangoFilterBackend
 from django.http import HttpResponse
 from rest_framework.views import APIView
@@ -29,6 +29,10 @@ class Map(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'map.html')
 
+class TambahNode(View):
+    def get(self, request, *args, **kwargs):
+        return render(request, 'node.html')
+
 
 
 
@@ -47,10 +51,16 @@ class MapView(viewsets.ModelViewSet):
 class NodeViewSet(viewsets.ModelViewSet):
     queryset = Node.objects.all()
     serializer_class = NodeSerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['node_id']
 
 class AcceleroXViewSet(viewsets.ModelViewSet):
     queryset = Data.objects.all()
     serializer_class = AcceleroXSerializer
+
+class PostViewSet(viewsets.ModelViewSet):
+    queryset = Post.objects.all()
+    serializer_class = PostSerializer
     
 
 def add_node(request):

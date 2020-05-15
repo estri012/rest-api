@@ -1,4 +1,4 @@
-from .models import Data,Node
+from .models import Data,Node,Post
 from rest_framework import serializers
 
 
@@ -17,3 +17,8 @@ class AcceleroXSerializer(serializers.ModelSerializer):
     class Meta:
         model = Data
         fields = ['timestamp', 'accelero_x']
+
+class PostSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = '__all__'

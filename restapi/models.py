@@ -19,7 +19,13 @@ class Data(models.Model):
 
 
 class Node(models.Model):
-    node_id = models.IntegerField()
+    node_id = models.IntegerField(primary_key=True)
+    latitude = models.CharField(max_length=250)
+    longitude = models.CharField(max_length=250)
+    location = models.CharField(max_length=500)
 
-
-
+class Post(models.Model):
+    contact = models.IntegerField(primary_key=True)
+    acs = models.CharField(max_length=250)
+    ais = models.CharField(max_length=250)
+    aes = models.CharField(max_length=250)

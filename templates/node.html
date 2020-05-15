@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- leaflet css -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.6.0/dist/leaflet.css"
+    integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="
+    crossorigin=""/>
+    <!--leaflet js after leaflet css-->
+    <script src="https://unpkg.com/leaflet@1.6.0/dist/leaflet.js"
+    integrity="sha512-gZwIG9x3wUXg2hdXF6+rVkLF/0Vi9U8D2Ntg4Ga5I5BZpVkVxlJWbSQtXPSiUTtC0TjtGOmxa1AJPuV0CPthew=="
+    crossorigin=""></script>
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+          <!-- kode form -->
+          <form id="form" method="POST" action="/api/node/">
+            <h2 style="font-weight: bolder;">Add New Node</h2>
+            <label for="node_id">Node Id* :</label></br>
+               <input type="text" name="node_id" placeholder="node id" id="node_id" style="width: 10%;" required />
+            </br></br>
+            <label style="font-weight: bold;">Get the latitude and longitude of the node</label></br>
+              <label for="latitude">Latitude* :</label></br>
+              <input type="text" name="latitude" placeholder="Latitude °" id="latitude" style="width: 40%;" />
+            </br>
+              <label for="longitude">Longitude* :</label></br>
+              <input type="text" name="longitude" placeholder="Longitude°" id="longitude" style="width: 40%;" />
+            </br></br>
+           <style>     /*map code*/
+             #node1Map {
+             height: 350px; }
+           </style>
+           <div id="node1Map"></div></br>
+           <label for="location">Location Address* :</label></br>
+           <input type="text" id="location" name="location" style="width: 100%;" />       
+           <div class="btn-block">
+             <button type="submit" href="/">Submit</button>
+           </div>
+         </form>
+
+<!--JQUERY DATA-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+<script>
+const map = L.map('node1Map').setView([-7.286190082778849, 109.52270507812501], 8);
+const attribution ='&copy: <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+
+const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+const tiles = L.tileLayer(tileUrl, { attribution });
+tiles.addTo(map);
+
+// get coordinate
+let marker;
+map.on('click', function(e) {
+  if(marker) map.removeLayer(marker);
+  const lat = e.latlng.lat;
+  const long = e.latlng.lng;
+  marker = L.marker([lat, long]).addTo(map);
+  document.getElementById('latitude').value = lat;
+  document.getElementById('longitude').value = long;
+});
+</script>
+
+        </div>
+        <!-- end of page content (container-fluid) -->
+
+      </div>
+      <!-- End of Main Content -->
+
+      <!-- Footer -->
+      <footer class="sticky-footer bg-white">
+        <div class="container my-auto">
+          <div class="copyright text-center my-auto">
+            <span>Copyright &copy; GMLEWS 2019</span>
+          </div>
+        </div>
+      </footer>
+      <!-- End of Footer -->
+
+    </div>
+    <!-- End of Content Wrapper -->
+
+  </div>
+  <!-- End of Page Wrapper -->
+
+  <!-- Scroll to Top Button-->
+  <a class="scroll-to-top rounded" href="#page-top">
+    <i class="fas fa-angle-up"></i>
+  </a>
+
+
+
+  <style>
+    html, body {
+    min-height: 100%;
+    }
+    body, div, form, input, select { 
+    padding: 0;
+    margin: 0;
+    outline: none;
+    }
+    form {
+    width: 100%;
+    padding: 20px;
+    background: #fff;
+    box-shadow: 0 2px 5px #ccc; 
+    }
+    input {
+    width: calc(100% - 10px);
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    vertical-align: middle;
+    }
+    input:hover, textarea:hover, select:hover {
+    outline: none;
+    border: 1px solid #095484;
+    }
+    .name input {
+    margin-bottom: 10px;
+    }
+    option {
+    background: #fff;
+    }
+    .btn-block {
+    margin-top: 20px;
+    text-align: center;
+    }
+    button {
+    width: 150px;
+    padding: 10px;
+    border: none;
+    -webkit-border-radius: 5px; 
+    -moz-border-radius: 5px; 
+    border-radius: 5px; 
+    background-color: #095484;
+    font-size: 16px;
+    color: #fff;
+    cursor: pointer;
+    }
+    button:hover {
+    background-color: #0666a3;
+    }
+    @media (min-width: 568px) {
+    .name {
+    display: flex;
+    justify-content: space-between;
+    }
+    .name input {
+    width: 47%;
+    margin-bottom: 0;
+    }
+    }
+  </style>
+
+{% endblock content %}
