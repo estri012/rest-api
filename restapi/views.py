@@ -40,7 +40,7 @@ class DataViewSet(viewsets.ModelViewSet):
         queryset = Data.objects.all()
         serializer_class = DataSerializer
         filter_backends = [DjangoFilterBackend]
-        filterset_fields = ['node_id']
+        filterset_fields = ['node_id', 'timestamp']
 
 
 class MapView(viewsets.ModelViewSet):

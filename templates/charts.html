@@ -4,987 +4,312 @@
     <meta charset="utf-8">
 
     <title>Try Chart</title>
-    <script src="https://code.jquery.com/jquery-1.7.1.min.js" integrity="sha256-iBcUE/x23aI6syuqF7EeT/+JFBxjPs5zeFJEXxumwb0=" crossorigin="anonymous"></script>
-    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
-    <script src="http://code.highcharts.com/stock/highstock.js"></script>
-    <script src="http://code.highcharts.com/stock/modules/exporting.js"></script>
-    <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
-    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/base/jquery-ui.css" rel="stylesheet" />
+<!-- <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script> -->
 
-  </head>
-  <!--container: acc_x
-        container2: vibration
-        container3: moisture
-        container4: acc_y
-        container5: acc_z
-        container6: gyro_x
-        container7: gyro_y
-        container8: gyro_z
-        container9: displacement-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
 
-  <body>
-    <div id="container" style="height: 400px; min-width: 600px"></div>
-    <br>
-    <br>
-    <div id="container4" style="height: 400px; min-width: 600px"></div>
-    <br>
-    <br>
-    <div id="container5" style="height: 400px; min-width: 600px"></div>
-    <br>
-    <div id="container6" style="height: 400px; min-width: 600px"></div>
-    <br>
-    <div id="container7" style="height: 400px; min-width: 600px"></div>
-    <br>
-    <div id="container8" style="height: 400px; min-width: 600px"></div>
-    <br>
-    <div id="container2" style="height: 400px; min-width: 600px"></div>
-    <br>
-    <div id="container3" style="height: 400px; min-width: 600px"></div>
-    <br>
-    <div id="container9" style="height: 400px; min-width: 600px"></div>
-  </body>
 
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script> -->
+ <body>
+    <ol class="breadcrumb">data from date : <input type="text" name="datefilter" value="" /></ol>
+<!--Download CSV-->
+<p>Click this button to download all data from node 1</p>
+  <div>
+    <button id="button1" class="button"><span>Download</span></button>
+  </div>
+      <div class="row"> 
+        <div class="col-sm-1"></div>
+          <canvas id="moistureChart" width="600" height="400">
+          </canvas>
+          <div class="col-sm-1"></div>
+          
+        </br></br></br>
+        <div class="row"> 
+          <div class="col-sm-1"></div>
+            <canvas id="accelero_xChart" width="600" height="400">
+            </canvas>
+            <div class="col-sm-1"></div>
+            </div>
+          </div>
+
+<!--Download CSV code-->
 <script>
-$(function () {     //get data function
-$.getJSON('https://gmlews.com/api/data/?node_id=1', function (data) {
-console.log(data);
-function format_two_digits(n) {
-  return n < 10 ? '0' + n : n;
-}
-var accelero_x = [], timestamp = [];    //get data accelero_x and timestamp
-  for (var i=0; i<data.length; i++){
-  let inArr = [];
-  inArr.push(Date.parse(data[i].timestamp));
-  inArr.push(data[i].accelero_x);
-    accelero_x.push(inArr);
-    timestamp.push(data[i].timestamp);
- }
-  console.log(accelero_x);
-  console.log(timestamp);
-    // Create the chart
-    window.chart = new Highcharts.StockChart({
-        chart: {
-            renderTo: 'container',
-        }, 
-    time: {
-      useUTC: false
-    },
-        rangeSelector: {        //get data per day per week per month
-            inputEnabled: true,
-                    buttons: [{
-                        type: 'day',
-                        count: 1,
-                        text: '1D',
-                    },
-                    {
-                        type: 'week',
-                        count: 1,
-                        text: '1W',
-                    },
-                    {
-                        type: 'month',
-                        count: 1,
-                        text: '1M',
-                    },
-                    {
-                        type: 'year',
-                        count: 1,
-                        text: '1Y',
-                    }, {
-                        type: 'all',
-                        count: 1,
-                        text: 'All',
-                    }],
-            inputDateFormat: '%d-%m-%Y',            //date format for rangeselector based on datepicker
-            inputDateParser: function (value) {
-                value = value.split('-');
-                return Date.UTC(
-                    parseInt(value[2]),
-                    parseInt(value[1]) - 1,
-                    parseInt(value[0])
-                );
-            },
-        },
-    title: {            //title charts
-    text: 'Accelero X'
-},
-yAxis: [{        //setting y axes
-        opposite: false,
-        labels: {
-            format: '{value} mV/g'
-        },
-        title: {
-            text: 'Accelero-X'
-        }
-      }],
-xAxis: [{                //setting x axes
-    type: "datetime",
-    title: {
-        text: 'Time'
-    },
-  labels: {
-        /* format: '{value:%Y-%m-%d}', */
-        formatter: (currData) => {
-          const currDate = new Date(currData.value);
-          return format_two_digits(currDate.getHours()) + ':' + format_two_digits(currDate.getMinutes());
-        },
-        align: 'left'
-    }
-}],
-series: [{              //setting data charts y axes
-    name: 'Accelero-x',
-    data: accelero_x,
-    type: 'spline',
-    connectNulls: true,
-    tooltip: {
-        valueDecimals: 4,
-        valueSuffix: ' mV/g'
-    }
-}]
-}, function (chart) {
-        // apply the date pickers
-        setTimeout(function () {
-            $('input.highcharts-range-selector', $('#' + chart.options.chart.renderTo)).datepicker();
-        }, 0)
+  $(document).ready(function() {
+  $("#button1").on('click', function(e) {
+    var url = "https://gmlews.com/api/data/?node_id=1";
+    $.ajax({
+      type: "GET",
+      url: url,
+      success: function(result) {
+        DownloadJsonData(result, "Node-1", true);
+      },
+      error: function(result) {
+        alert('Error ');
+      }
     });
-});
-// Set the datepicker's date format
-$.datepicker.setDefaults({
-    dateFormat: 'dd-mm-yy',
-    beforeShow: function() {
-      var date = $(this).val().split('-');
-        $('input.highcharts-range-selector').datepicker("setDate", new Date(parseFloat(date[0]), parseFloat(date[1]) - 1, parseFloat(date[2])));
-    },
-    onSelect: function (dateText) {
-        this.onchange();
-        this.onblur();
+  });
+
+  function DownloadJsonData(JSONData, FileTitle, ShowLabel) {
+    //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+    var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+    var CSV = '';
+    //This condition will generate the Label/Header
+    if (ShowLabel) {
+      var row = "";
+      //This loop will extract the label from 1st index of on array
+      for (var index in arrData[0]) {
+        //Now convert each value to string and comma-seprated
+        row += index + ',';
+      }
+      row = row.slice(0, -1);
+      //append Label row with line break
+      CSV += row + '\r\n';
     }
-});
-});
+    //1st loop is to extract each row
+    for (var i = 0; i < arrData.length; i++) {
+      var row = "";
+      //2nd loop will extract each column and convert it in string comma-seprated
+      for (var index in arrData[i]) {
+        row += '"' + arrData[i][index] + '",';
+      }
+      row.slice(0, row.length - 1);
+      //add a line break after each row
+      CSV += row + '\r\n';
+    }
+    if (CSV == '') {
+      alert("Invalid data");
+      return;
+    }
+    //Generate a file name
+    var filename = FileTitle + (new Date());
+    var blob = new Blob([CSV], {
+      type: 'text/csv;charset=utf-8;'
+    });
+    if (navigator.msSaveBlob) { // IE 10+
+      navigator.msSaveBlob(blob, filename);
+    } else {
+      var link = document.createElement("a");
+      if (link.download !== undefined) { // feature detection
+        // Browsers that support HTML5 download attribute
+        var url = URL.createObjectURL(blob);
+        link.setAttribute("href", url);
+        link.style = "visibility:hidden";
+        link.download = filename + ".csv";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+    }
+  }
+})
 </script>
 
+
+
+<!--Chart code-->
 <script>
-    $(function () {         //get data function
-    $.getJSON('https://gmlews.com/api/data/?node_id=1', function (data) {
-    console.log(data);
-    function format_two_digits(n) {
-      return n < 10 ? '0' + n : n;
+  $(function() {
+
+$('input[name="datefilter"]').daterangepicker({
+        showDropdowns : true,
+    autoUpdateInput: false,
+    locale: {
+        cancelLabel: 'Clear'
     }
-    var vibration = [], timestamp = [];         //get data vibration and timestamp
-      for (var i=0; i<data.length; i++){
-      let inArr = [];
-      inArr.push(Date.parse(data[i].timestamp));
-      inArr.push(data[i].vibration);
-        vibration.push(inArr);
-        timestamp.push(data[i].timestamp);
-     }
-      console.log(vibration);
-      console.log(timestamp);      
-        // Create the chart
-        window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'container2'
-            },
-        time: {
-          useUTC: false
-      },
-            rangeSelector: {            //get data per day per week per month
-                inputEnabled: true,
-                        buttons: [{
-                            type: 'day',
-                            count: 1,
-                            text: '1D',
-                        },
-                        {
-                            type: 'week',
-                            count: 1,
-                            text: '1W',
-                        },
-                        {
-                            type: 'month',
-                            count: 1,
-                            text: '1M',
-                        },
-                        {
-                            type: 'year',
-                            count: 1,
-                            text: '1Y',
-                        }, {
-                            type: 'all',
-                            count: 1,
-                            text: 'All',
-                        }],
-                inputDateFormat: '%d-%m-%Y',            //date format for rangeselector based on datepicker
-                inputDateParser: function (value) {
-                    value = value.split('-');
-                    return Date.UTC(
-                        parseInt(value[2]),
-                        parseInt(value[1]) - 1,
-                        parseInt(value[0])
-                    );
-                },
-            },
-        title: {            //title chart
-        text: 'Vibration'
-    },
-    xAxis: {                //setting x axes
-        type: "datetime",
-      labels: {
-            /* format: '{value:%Y-%m-%d}', */
-            formatter: (currData) => {
-              const currDate = new Date(currData.value);
-              return format_two_digits(currDate.getHours()) + ':' + format_two_digits(currDate.getMinutes());
-            },
-            rotation: 45,
-            align: 'left'
-        }
-    },
-    series: [{                  //setting data y axes
-        name: 'Vibration',
-        data: vibration,
-        type: 'spline',
-    }]
-    }, function (chart) {
-            // apply the date pickers
-            setTimeout(function () {
-                $('input.highcharts-range-selector', $('#' + chart.options.chart.renderTo)).datepicker();
-            }, 0)
-        });
-    });
-    // Set the datepicker's date format
-    $.datepicker.setDefaults({
-        dateFormat: 'dd-mm-yy',
-        beforeShow: function() {
-          var date = $(this).val().split('-');
-            $('input.highcharts-range-selector').datepicker("setDate", new Date(parseFloat(date[0]), parseFloat(date[1]) - 1, parseFloat(date[2])));
-        },
-        onSelect: function (dateText) {
-            this.onchange();
-            this.onblur();
-        }
-    });
-    });
-      </script>
+});
+
+$('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+    $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+var fromDate = picker.startDate.format('YYYY-MM-DD');
+var toDate = picker.endDate.format('YYYY-MM-DD');
+if (fromDate != '' && toDate != '') {
+          console.log(fromDate, toDate);
+          var endpoint = 'https://gmlews.com/api/data/?node_id=1';
+
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    fromDate: fromDate,
+    toDate: toDate
+  },
+  success: function(data){
+    console.log(data); //get all data
+    //get data by fields
+    var accelero_x = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      accelero_x.push(data[i].accelero_x);
+      timestamp.push(data[i].timestamp);
+   }
+    console.log(accelero_x);
+    console.log(timestamp);
+  //plot the chart
     
-    <script>
-        $(function () {         //get data function
-        $.getJSON('https://gmlews.com/api/data/?node_id=1', function (data) {
-        console.log(data);
-        function format_two_digits(n) {
-          return n < 10 ? '0' + n : n;
-        }
-        var moisture = [], timestamp = [];         //get data moisture and timestamp
-          for (var i=0; i<data.length; i++){
-          let inArr = [];
-          inArr.push(Date.parse(data[i].timestamp));
-          inArr.push(data[i].moisture);
-            moisture.push(inArr);
-            timestamp.push(data[i].timestamp);
-         }
-          console.log(moisture);
-          console.log(timestamp);      
-            // Create the chart
-            window.chart = new Highcharts.StockChart({
-                chart: {
-                    renderTo: 'container3'
-                },
-            time: {
-              useUTC: false
-          },
-                rangeSelector: {            //get data per day per week per month
-                    inputEnabled: true,
-                            buttons: [{
-                                type: 'day',
-                                count: 1,
-                                text: '1D',
-                            },
-                            {
-                                type: 'week',
-                                count: 1,
-                                text: '1W',
-                            },
-                            {
-                                type: 'month',
-                                count: 1,
-                                text: '1M',
-                            },
-                            {
-                                type: 'year',
-                                count: 1,
-                                text: '1Y',
-                            }, {
-                                type: 'all',
-                                count: 1,
-                                text: 'All',
-                            }],
-                    inputDateFormat: '%d-%m-%Y',            //date format for rangeselector based on datepicker
-                    inputDateParser: function (value) {
-                        value = value.split('-');
-                        return Date.UTC(
-                            parseInt(value[2]),
-                            parseInt(value[1]) - 1,
-                            parseInt(value[0])
-                        );
+    var ctx = document.getElementById("accelero_xChart").getContext('2d');
+    var accelero_xChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'accelero-x',
+                data: accelero_x,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                borderCapStyle: 'round',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:false,
+                        stepSize:10
                     },
-                },
-            title: {            //title chart
-            text: 'Moisture'
-        },
-        xAxis: {                //setting x axes
-            type: "datetime",
-          labels: {
-                /* format: '{value:%Y-%m-%d}', */
-                formatter: (currData) => {
-                  const currDate = new Date(currData.value);
-                  return format_two_digits(currDate.getHours()) + ':' + format_two_digits(currDate.getMinutes());
-                },
-                rotation: 45,
-                align: 'left'
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'accelero-x'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(fromDate).toDate(),//Date object type
+                              max: moment(toDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
             }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+//moisturechart
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    fromDate: fromDate,
+    toDate: toDate
+  },
+  success: function(data){
+    console.log(data); //get all data
+    //get data by fields
+    var moisture = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      moisture.push(data[i].moisture);
+      timestamp.push(data[i].timestamp);
+   }
+    console.log(moisture);
+    console.log(timestamp);
+  //plot the chart
+    
+    var ctx = document.getElementById("moistureChart").getContext('2d');
+    var moistureChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'kelembaban',
+                data: moisture,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                borderCapStyle: 'round',
+                borderWidth: 1
+            }]
         },
-        series: [{                  //setting data y axes
-            name: 'Moisture',
-            data: moisture,
-            type: 'spline',
-        }]
-        }, function (chart) {
-                // apply the date pickers
-                setTimeout(function () {
-                    $('input.highcharts-range-selector', $('#' + chart.options.chart.renderTo)).datepicker();
-                }, 0)
-            });
-        });
-        // Set the datepicker's date format
-        $.datepicker.setDefaults({
-            dateFormat: 'dd-mm-yy',
-            beforeShow: function() {
-              var date = $(this).val().split('-');
-                $('input.highcharts-range-selector').datepicker("setDate", new Date(parseFloat(date[0]), parseFloat(date[1]) - 1, parseFloat(date[2])));
-            },
-            onSelect: function (dateText) {
-                this.onchange();
-                this.onblur();
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:false,
+                        stepSize:10
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'kelembaban'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(fromDate).toDate(),//Date object type
+                              max: moment(toDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time'
+                  }
+                }]
             }
-        });
-        });
-          </script>
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
 
-<script>
-    $(function () {         //get data function
-    $.getJSON('https://gmlews.com/api/data/?node_id=1', function (data) {
-    console.log(data);
-    function format_two_digits(n) {
-      return n < 10 ? '0' + n : n;
-    }
-    var accelero_y = [], timestamp = [];         //get data acc_y and timestamp
-      for (var i=0; i<data.length; i++){
-      let inArr = [];
-      inArr.push(Date.parse(data[i].timestamp));
-      inArr.push(data[i].accelero_y);
-        accelero_y.push(inArr);
-        timestamp.push(data[i].timestamp);
-     }
-      console.log(accelero_y);
-      console.log(timestamp);      
-        // Create the chart
-        window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'container4'
-            },
-        time: {
-          useUTC: false
-      },
-            rangeSelector: {            //get data per day per week per month
-                inputEnabled: true,
-                        buttons: [{
-                            type: 'day',
-                            count: 1,
-                            text: '1D',
-                        },
-                        {
-                            type: 'week',
-                            count: 1,
-                            text: '1W',
-                        },
-                        {
-                            type: 'month',
-                            count: 1,
-                            text: '1M',
-                        },
-                        {
-                            type: 'year',
-                            count: 1,
-                            text: '1Y',
-                        }, {
-                            type: 'all',
-                            count: 1,
-                            text: 'All',
-                        }],
-                inputDateFormat: '%d-%m-%Y',            //date format for rangeselector based on datepicker
-                inputDateParser: function (value) {
-                    value = value.split('-');
-                    return Date.UTC(
-                        parseInt(value[2]),
-                        parseInt(value[1]) - 1,
-                        parseInt(value[0])
-                    );
-                },
-            },
-        title: {            //title chart
-        text: 'Accelero Y'
-    },
-    xAxis: {                //setting x axes
-        type: "datetime",
-      labels: {
-            /* format: '{value:%Y-%m-%d}', */
-            formatter: (currData) => {
-              const currDate = new Date(currData.value);
-              return format_two_digits(currDate.getHours()) + ':' + format_two_digits(currDate.getMinutes());
-            },
-            rotation: 45,
-            align: 'left'
-        }
-    },
-    series: [{                  //setting data y axes
-        name: 'Accelero Y',
-        data: accelero_y,
-        type: 'spline',
-    }]
-    }, function (chart) {
-            // apply the date pickers
-            setTimeout(function () {
-                $('input.highcharts-range-selector', $('#' + chart.options.chart.renderTo)).datepicker();
-            }, 0)
-        });
-    });
-    // Set the datepicker's date format
-    $.datepicker.setDefaults({
-        dateFormat: 'dd-mm-yy',
-        beforeShow: function() {
-          var date = $(this).val().split('-');
-            $('input.highcharts-range-selector').datepicker("setDate", new Date(parseFloat(date[0]), parseFloat(date[1]) - 1, parseFloat(date[2])));
-        },
-        onSelect: function (dateText) {
-            this.onchange();
-            this.onblur();
-        }
-    });
-    });
-      </script>
+});
 
-<script>
-    $(function () {         //get data function
-    $.getJSON('https://gmlews.com/api/data/?node_id=1', function (data) {
-    console.log(data);
-    function format_two_digits(n) {
-      return n < 10 ? '0' + n : n;
-    }
-    var accelero_z = [], timestamp = [];         //get data acc_z and timestamp
-      for (var i=0; i<data.length; i++){
-      let inArr = [];
-      inArr.push(Date.parse(data[i].timestamp));
-      inArr.push(data[i].accelero_z);
-        accelero_z.push(inArr);
-        timestamp.push(data[i].timestamp);
-     }
-      console.log(accelero_z);
-      console.log(timestamp);      
-        // Create the chart
-        window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'container5'
-            },
-        time: {
-          useUTC: false
-      },
-            rangeSelector: {            //get data per day per week per month
-                inputEnabled: true,
-                        buttons: [{
-                            type: 'day',
-                            count: 1,
-                            text: '1D',
-                        },
-                        {
-                            type: 'week',
-                            count: 1,
-                            text: '1W',
-                        },
-                        {
-                            type: 'month',
-                            count: 1,
-                            text: '1M',
-                        },
-                        {
-                            type: 'year',
-                            count: 1,
-                            text: '1Y',
-                        }, {
-                            type: 'all',
-                            count: 1,
-                            text: 'All',
-                        }],
-                inputDateFormat: '%d-%m-%Y',            //date format for rangeselector based on datepicker
-                inputDateParser: function (value) {
-                    value = value.split('-');
-                    return Date.UTC(
-                        parseInt(value[2]),
-                        parseInt(value[1]) - 1,
-                        parseInt(value[0])
-                    );
-                },
-            },
-        title: {            //title chart
-        text: 'Accelero Z'
-    },
-    xAxis: {                //setting x axes
-        type: "datetime",
-      labels: {
-            /* format: '{value:%Y-%m-%d}', */
-            formatter: (currData) => {
-              const currDate = new Date(currData.value);
-              return format_two_digits(currDate.getHours()) + ':' + format_two_digits(currDate.getMinutes());
-            },
-            rotation: 45,
-            align: 'left'
-        }
-    },
-    series: [{                  //setting data y axes
-        name: 'Accelero Z',
-        data: accelero_z,
-        type: 'spline',
-    }]
-    }, function (chart) {
-            // apply the date pickers
-            setTimeout(function () {
-                $('input.highcharts-range-selector', $('#' + chart.options.chart.renderTo)).datepicker();
-            }, 0)
-        });
-    });
-    // Set the datepicker's date format
-    $.datepicker.setDefaults({
-        dateFormat: 'dd-mm-yy',
-        beforeShow: function() {
-          var date = $(this).val().split('-');
-            $('input.highcharts-range-selector').datepicker("setDate", new Date(parseFloat(date[0]), parseFloat(date[1]) - 1, parseFloat(date[2])));
-        },
-        onSelect: function (dateText) {
-            this.onchange();
-            this.onblur();
-        }
-    });
-    });
-      </script>
+} //if function end
+}); //tombol apply end
 
-<script>
-    $(function () {         //get data function
-    $.getJSON('https://gmlews.com/api/data/?node_id=1', function (data) {
-    console.log(data);
-    function format_two_digits(n) {
-      return n < 10 ? '0' + n : n;
-    }
-    var gyro_x = [], timestamp = [];         //get data gyro_x and timestamp
-      for (var i=0; i<data.length; i++){
-      let inArr = [];
-      inArr.push(Date.parse(data[i].timestamp));
-      inArr.push(data[i].gyro_x);
-        gyro_x.push(inArr);
-        timestamp.push(data[i].timestamp);
-     }
-      console.log(gyro_x);
-      console.log(timestamp);      
-        // Create the chart
-        window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'container6'
-            },
-        time: {
-          useUTC: false
-      },
-            rangeSelector: {            //get data per day per week per month
-                inputEnabled: true,
-                        buttons: [{
-                            type: 'day',
-                            count: 1,
-                            text: '1D',
-                        },
-                        {
-                            type: 'week',
-                            count: 1,
-                            text: '1W',
-                        },
-                        {
-                            type: 'month',
-                            count: 1,
-                            text: '1M',
-                        },
-                        {
-                            type: 'year',
-                            count: 1,
-                            text: '1Y',
-                        }, {
-                            type: 'all',
-                            count: 1,
-                            text: 'All',
-                        }],
-                inputDateFormat: '%d-%m-%Y',            //date format for rangeselector based on datepicker
-                inputDateParser: function (value) {
-                    value = value.split('-');
-                    return Date.UTC(
-                        parseInt(value[2]),
-                        parseInt(value[1]) - 1,
-                        parseInt(value[0])
-                    );
-                },
-            },
-        title: {            //title chart
-        text: 'Gyro X'
-    },
-    xAxis: {                //setting x axes
-        type: "datetime",
-      labels: {
-            /* format: '{value:%Y-%m-%d}', */
-            formatter: (currData) => {
-              const currDate = new Date(currData.value);
-              return format_two_digits(currDate.getHours()) + ':' + format_two_digits(currDate.getMinutes());
-            },
-            rotation: 45,
-            align: 'left'
-        }
-    },
-    series: [{                  //setting data y axes
-        name: 'Gyro X',
-        data: gyro_x,
-        type: 'spline',
-    }]
-    }, function (chart) {
-            // apply the date pickers
-            setTimeout(function () {
-                $('input.highcharts-range-selector', $('#' + chart.options.chart.renderTo)).datepicker();
-            }, 0)
-        });
-    });
-    // Set the datepicker's date format
-    $.datepicker.setDefaults({
-        dateFormat: 'dd-mm-yy',
-        beforeShow: function() {
-          var date = $(this).val().split('-');
-            $('input.highcharts-range-selector').datepicker("setDate", new Date(parseFloat(date[0]), parseFloat(date[1]) - 1, parseFloat(date[2])));
-        },
-        onSelect: function (dateText) {
-            this.onchange();
-            this.onblur();
-        }
-    });
-    });
-      </script>
 
-<script>
-    $(function () {         //get data function
-    $.getJSON('https://gmlews.com/api/data/?node_id=1', function (data) {
-    console.log(data);
-    function format_two_digits(n) {
-      return n < 10 ? '0' + n : n;
-    }
-    var gyro_y = [], timestamp = [];         //get data gyro_y and timestamp
-      for (var i=0; i<data.length; i++){
-      let inArr = [];
-      inArr.push(Date.parse(data[i].timestamp));
-      inArr.push(data[i].gyro_y);
-        gyro_y.push(inArr);
-        timestamp.push(data[i].timestamp);
-     }
-      console.log(gyro_y);
-      console.log(timestamp);      
-        // Create the chart
-        window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'container7'
-            },
-        time: {
-          useUTC: false
-      },
-            rangeSelector: {            //get data per day per week per month
-                inputEnabled: true,
-                        buttons: [{
-                            type: 'day',
-                            count: 1,
-                            text: '1D',
-                        },
-                        {
-                            type: 'week',
-                            count: 1,
-                            text: '1W',
-                        },
-                        {
-                            type: 'month',
-                            count: 1,
-                            text: '1M',
-                        },
-                        {
-                            type: 'year',
-                            count: 1,
-                            text: '1Y',
-                        }, {
-                            type: 'all',
-                            count: 1,
-                            text: 'All',
-                        }],
-                inputDateFormat: '%d-%m-%Y',            //date format for rangeselector based on datepicker
-                inputDateParser: function (value) {
-                    value = value.split('-');
-                    return Date.UTC(
-                        parseInt(value[2]),
-                        parseInt(value[1]) - 1,
-                        parseInt(value[0])
-                    );
-                },
-            },
-        title: {            //title chart
-        text: 'Gyro Y'
-    },
-    xAxis: {                //setting x axes
-        type: "datetime",
-      labels: {
-            /* format: '{value:%Y-%m-%d}', */
-            formatter: (currData) => {
-              const currDate = new Date(currData.value);
-              return format_two_digits(currDate.getHours()) + ':' + format_two_digits(currDate.getMinutes());
-            },
-            rotation: 45,
-            align: 'left'
-        }
-    },
-    series: [{                  //setting data y axes
-        name: 'Gyro Y',
-        data: gyro_y,
-        type: 'spline',
-    }]
-    }, function (chart) {
-            // apply the date pickers
-            setTimeout(function () {
-                $('input.highcharts-range-selector', $('#' + chart.options.chart.renderTo)).datepicker();
-            }, 0)
-        });
-    });
-    // Set the datepicker's date format
-    $.datepicker.setDefaults({
-        dateFormat: 'dd-mm-yy',
-        beforeShow: function() {
-          var date = $(this).val().split('-');
-            $('input.highcharts-range-selector').datepicker("setDate", new Date(parseFloat(date[0]), parseFloat(date[1]) - 1, parseFloat(date[2])));
-        },
-        onSelect: function (dateText) {
-            this.onchange();
-            this.onblur();
-        }
-    });
-    });
-      </script>
+$('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+    $(this).val('');
+});
 
-<script>
-    $(function () {         //get data function
-    $.getJSON('https://gmlews.com/api/data/?node_id=1', function (data) {
-    console.log(data);
-    function format_two_digits(n) {
-      return n < 10 ? '0' + n : n;
-    }
-    var gyro_z = [], timestamp = [];         //get data gyro_z and timestamp
-      for (var i=0; i<data.length; i++){
-      let inArr = [];
-      inArr.push(Date.parse(data[i].timestamp));
-      inArr.push(data[i].gyro_z);
-        gyro_z.push(inArr);
-        timestamp.push(data[i].timestamp);
-     }
-      console.log(gyro_z);
-      console.log(timestamp);      
-        // Create the chart
-        window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'container8'
-            },
-        time: {
-          useUTC: false
-      },
-            rangeSelector: {            //get data per day per week per month
-                inputEnabled: true,
-                        buttons: [{
-                            type: 'day',
-                            count: 1,
-                            text: '1D',
-                        },
-                        {
-                            type: 'week',
-                            count: 1,
-                            text: '1W',
-                        },
-                        {
-                            type: 'month',
-                            count: 1,
-                            text: '1M',
-                        },
-                        {
-                            type: 'year',
-                            count: 1,
-                            text: '1Y',
-                        }, {
-                            type: 'all',
-                            count: 1,
-                            text: 'All',
-                        }],
-                inputDateFormat: '%d-%m-%Y',            //date format for rangeselector based on datepicker
-                inputDateParser: function (value) {
-                    value = value.split('-');
-                    return Date.UTC(
-                        parseInt(value[2]),
-                        parseInt(value[1]) - 1,
-                        parseInt(value[0])
-                    );
-                },
-            },
-        title: {            //title chart
-        text: 'Gyro Z'
-    },
-    xAxis: {                //setting x axes
-        type: "datetime",
-      labels: {
-            /* format: '{value:%Y-%m-%d}', */
-            formatter: (currData) => {
-              const currDate = new Date(currData.value);
-              return format_two_digits(currDate.getHours()) + ':' + format_two_digits(currDate.getMinutes());
-            },
-            rotation: 45,
-            align: 'left'
-        }
-    },
-    series: [{                  //setting data y axes
-        name: 'Gyro Z',
-        data: gyro_z,
-        type: 'spline',
-    }]
-    }, function (chart) {
-            // apply the date pickers
-            setTimeout(function () {
-                $('input.highcharts-range-selector', $('#' + chart.options.chart.renderTo)).datepicker();
-            }, 0)
-        });
-    });
-    // Set the datepicker's date format
-    $.datepicker.setDefaults({
-        dateFormat: 'dd-mm-yy',
-        beforeShow: function() {
-          var date = $(this).val().split('-');
-            $('input.highcharts-range-selector').datepicker("setDate", new Date(parseFloat(date[0]), parseFloat(date[1]) - 1, parseFloat(date[2])));
-        },
-        onSelect: function (dateText) {
-            this.onchange();
-            this.onblur();
-        }
-    });
-    });
-      </script>
+});//function end
+</script>
 
-<script>
-    $(function () {         //get data function
-    $.getJSON('https://gmlews.com/api/data/?node_id=1', function (data) {
-    console.log(data);
-    function format_two_digits(n) {
-      return n < 10 ? '0' + n : n;
-    }
-    var displacement = [], timestamp = [];         //get data displacement and timestamp
-      for (var i=0; i<data.length; i++){
-      let inArr = [];
-      inArr.push(Date.parse(data[i].timestamp));
-      inArr.push(data[i].displacement);
-        displacement.push(inArr);
-        timestamp.push(data[i].timestamp);
-     }
-      console.log(displacement);
-      console.log(timestamp);      
-        // Create the chart
-        window.chart = new Highcharts.StockChart({
-            chart: {
-                renderTo: 'container9'
-            },
-        time: {
-          useUTC: false
-      },
-            rangeSelector: {            //get data per day per week per month
-                inputEnabled: true,
-                        buttons: [{
-                            type: 'day',
-                            count: 1,
-                            text: '1D',
-                        },
-                        {
-                            type: 'week',
-                            count: 1,
-                            text: '1W',
-                        },
-                        {
-                            type: 'month',
-                            count: 1,
-                            text: '1M',
-                        },
-                        {
-                            type: 'year',
-                            count: 1,
-                            text: '1Y',
-                        }, {
-                            type: 'all',
-                            count: 1,
-                            text: 'All',
-                        }],
-                inputDateFormat: '%d-%m-%Y',            //date format for rangeselector based on datepicker
-                inputDateParser: function (value) {
-                    value = value.split('-');
-                    return Date.UTC(
-                        parseInt(value[2]),
-                        parseInt(value[1]) - 1,
-                        parseInt(value[0])
-                    );
-                },
-            },
-        title: {            //title chart
-        text: 'Displacement'
-    },
-    xAxis: {                //setting x axes
-        type: "datetime",
-      labels: {
-            /* format: '{value:%Y-%m-%d}', */
-            formatter: (currData) => {
-              const currDate = new Date(currData.value);
-              return format_two_digits(currDate.getHours()) + ':' + format_two_digits(currDate.getMinutes());
-            },
-            rotation: 45,
-            align: 'left'
-        }
-    },
-    series: [{                  //setting data y axes
-        name: 'Displacement',
-        data: displacement,
-        type: 'spline',
-    }]
-    }, function (chart) {
-            // apply the date pickers
-            setTimeout(function () {
-                $('input.highcharts-range-selector', $('#' + chart.options.chart.renderTo)).datepicker();
-            }, 0)
-        });
-    });
-    // Set the datepicker's date format
-    $.datepicker.setDefaults({
-        dateFormat: 'dd-mm-yy',
-        beforeShow: function() {
-          var date = $(this).val().split('-');
-            $('input.highcharts-range-selector').datepicker("setDate", new Date(parseFloat(date[0]), parseFloat(date[1]) - 1, parseFloat(date[2])));
-        },
-        onSelect: function (dateText) {
-            this.onchange();
-            this.onblur();
-        }
-    });
-    });
-      </script>
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/jquery.ui.datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    
+  <!--buat kalender-->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/themes/sunny/jquery-ui.min.css"></link>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css"></link>
+    
+ </body>
 
 </html>

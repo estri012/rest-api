@@ -26,7 +26,7 @@ $(document).ready(function(){
         var to_date = $("#lastdatepicker").val();
         if (from_date != '' && to_date != '') {
           console.log(from_date, to_date);
-          var endpoint = '/api/data';
+          var endpoint = 'https://gmlews.com/api/data/?node_id=1';
 
       $.ajax({
         method: "GET",
@@ -122,7 +122,7 @@ $(document).ready(function(){
           var to_date = $("#lastdatepicker").val();
           if (from_date != '' && to_date != '') {
             console.log(from_date, to_date);
-            var endpoint = '/api/data';
+            var endpoint = 'https://gmlews.com/api/data';
   
         $.ajax({
           method: "GET",
@@ -227,6 +227,7 @@ $(document).ready(function(){
             <canvas id="moistureChart" width="600" height="400">
             </canvas>
             <div class="col-sm-1"></div>
+            
             <br>
             <h1>Chart2</h1>
             <br>
