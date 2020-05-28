@@ -1,0 +1,885 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.9.1/underscore-min.js"></script> -->
+
+
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+<h2>Node Id : {{ node.node_id }}, Node Name : {{ node.name }}</h2>
+  <p>Choose data from date : </p><input style="width: 30%;" type="text" name="datefilter" value="" />
+<p>Choose the date then Click this button to download data from {{ node.name }}</p>
+<div>
+  <button id="button1" type="button" class="button"><span>Prepare download</span></button>
+</div></br></br>
+<!--accelero x chart-->
+<div class="row">
+<h5 style="font-weight: bold;">Accelero-X Chart</h5> 
+  <div class="col-sm-1"></div>
+    <canvas id="accelero_xChart" width="600" height="300">
+    </canvas>
+    <div class="col-sm-1"></div>
+  </div>
+<!--accelero y chart-->
+  </br></br></br>
+  <div class="row">
+    <h5 style="font-weight: bold;">Accelero-Y Chart</h5>  
+    <div class="col-sm-1"></div>
+      <canvas id="accelero_yChart" width="600" height="300">
+      </canvas>
+      <div class="col-sm-1"></div>
+      </div>
+<!--accelero z chart-->
+    </br></br></br>
+    <div class="row"> 
+      <h5 style="font-weight: bold;">Accelero-Z Chart</h5> 
+      <div class="col-sm-1"></div>
+        <canvas id="accelero_zChart" width="600" height="300">
+        </canvas>
+        <div class="col-sm-1"></div>
+        </div>
+<!--gyro x chart-->
+    </br></br></br>
+    <div class="row"> 
+      <h5 style="font-weight: bold;">Gyro-X Chart</h5> 
+      <div class="col-sm-1"></div>
+        <canvas id="gyro_xChart" width="600" height="300">
+        </canvas>
+        <div class="col-sm-1"></div>
+        </div>
+<!--gyro y chart-->
+    </br></br></br>
+    <div class="row"> 
+      <h5 style="font-weight: bold;">Gyro-Y Chart</h5>
+      <div class="col-sm-1"></div>
+        <canvas id="gyro_yChart" width="600" height="300">
+        </canvas>
+        <div class="col-sm-1"></div>
+        </div>
+<!--gyro z chart-->
+</br></br></br>
+<div class="row"> 
+  <h5 style="font-weight: bold;">Gyro-Z Chart</h5>
+  <div class="col-sm-1"></div>
+    <canvas id="gyro_zChart" width="600" height="300">
+    </canvas>
+    <div class="col-sm-1"></div>
+    </div>
+<!--moisture chart-->
+</br></br></br>
+<div class="row"> 
+  <h5 style="font-weight: bold;">Moisture Chart</h5>
+  <div class="col-sm-1"></div>
+    <canvas id="moistureChart" width="600" height="300">
+    </canvas>
+    <div class="col-sm-1"></div>
+    </div>
+<!--vibration chart-->
+</br></br></br>
+<div class="row"> 
+  <h5 style="font-weight: bold;">Vibration Chart</h5>
+  <div class="col-sm-1"></div>
+    <canvas id="vibrationChart" width="600" height="300">
+    </canvas>
+    <div class="col-sm-1"></div>
+    </div>
+<!--displacement chart-->
+</br></br></br>
+<div class="row"> 
+  <h5 style="font-weight: bold;">Displacement Chart</h5>
+  <div class="col-sm-1"></div>
+    <canvas id="displacementChart" width="600" height="300">
+    </canvas>
+    <div class="col-sm-1"></div>
+    </div>
+    
+
+  </div>
+  <!-- end of page content (container-fluid) -->
+
+</div>
+<!-- End of Main Content -->
+
+<!-- Footer -->
+<footer class="sticky-footer bg-white">
+  <div class="container my-auto">
+    <div class="copyright text-center my-auto">
+      <span>Copyright &copy; GMLEWS 2019</span>
+    </div>
+  </div>
+</footer>
+<!-- End of Footer -->
+
+</div>
+<!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+<i class="fas fa-angle-up"></i>
+</a>
+
+
+
+<script>
+  let filteredData;
+const ConvertToCSV = data => {
+  if (!data || data.length === 0) { 
+    console.log("data was empty");
+    return;
+  }
+  let csv = [Object.keys(data[0]).slice(0).join(",")];
+  data.forEach(
+    item => csv.push(
+      Object.values(item).join(",")
+    )
+  )
+  csv=csv.join("\n");
+  console.log(csv);
+  const $link = $('<a/>',{ href: "data:text/csv;charset=utf-8,"+escape(csv), download:"download_data_{{ node.name }}.csv",text:"download"});
+  
+  $('#button1').after($link)
+  $link.click();
+}; //ConvertToCSV end
+$(function() {
+
+  $('input[name="datefilter"]').daterangepicker({
+    showDropdowns: true,
+    autoUpdateInput: false,
+    locale: {
+      cancelLabel: 'Clear'
+    }
+  });
+
+  // Convert JSON to CSV & Display CSV
+  $('#button1').on("click", function() {
+    if (filteredData) ConvertToCSV(filteredData)
+    else alert("Please choose the date first");
+  }).prop("disabled", true);
+
+
+  $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+    $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    var startDate = picker.startDate.format('YYYY-MM-DD');
+    var endDate = picker.endDate.format('YYYY-MM-DD');
+    if (startDate != '' && endDate != '') {
+      console.log(startDate, endDate);
+      var endpoint = "http://127.0.0.1:8000/api/data/?node_id={{ node.node_id }}";
+
+      $.ajax({
+        method: "GET",
+        url: endpoint,
+        data: {
+          startDate: startDate,
+          endDate: endDate
+        },
+        success: function(data) {
+          //get filtered data for CSV
+          filteredData = data.filter(item => item.timestamp > startDate && item.timestamp < endDate)
+          console.log(filteredData);
+           $('#button1').prop("disabled",false); //download button on
+        } //function(data)end
+      }) //ajax end
+//accelero_x chart
+  $.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var accelero_x = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      accelero_x.push(data[i].accelero_x);
+      timestamp.push(data[i].timestamp);
+   }
+  //plot the chart
+    var ctx = document.getElementById("accelero_xChart").getContext('2d');
+    var accelero_xChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'accelero-x (mV/g)',
+                data: accelero_x,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:false,
+                        stepSize:0.1
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'accelero-x (mV/g)'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+//accelero_y chart
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var accelero_y = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      accelero_y.push(data[i].accelero_y);
+      timestamp.push(data[i].timestamp);
+   }
+  //plot the chart
+    var ctx = document.getElementById("accelero_yChart").getContext('2d');
+    var accelero_yChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'accelero-y (mV/g)',
+                data: accelero_y,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:false,
+                        stepSize:0.1
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'accelero-y (mV/g)'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+//accelero_z chart
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var accelero_z = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      accelero_z.push(data[i].accelero_z);
+      timestamp.push(data[i].timestamp);
+   }
+  //plot the chart
+    var ctx = document.getElementById("accelero_zChart").getContext('2d');
+    var accelero_zChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'accelero-z (mV/g)',
+                data: accelero_z,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:false,
+                        stepSize:0.1
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'accelero-z (mV/g)'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+//gyro_x chart
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var gyro_x = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      gyro_x.push(data[i].gyro_x);
+      timestamp.push(data[i].timestamp);
+   }
+  //plot the chart
+    var ctx = document.getElementById("gyro_xChart").getContext('2d');
+    var gyro_xChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'gyro-x (°/s)',
+                data: gyro_x,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:false,
+                        stepSize:0.1
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'gyro-x (°/s)'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+//gyro_y chart
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var gyro_y = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      gyro_y.push(data[i].gyro_y);
+      timestamp.push(data[i].timestamp);
+   }
+  //plot the chart
+    var ctx = document.getElementById("gyro_yChart").getContext('2d');
+    var gyro_yChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'gyro-y (°/s)',
+                data: gyro_y,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:false,
+                        stepSize:0.1
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'gyro-y (°/s)'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+//gyro_z chart
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var gyro_z = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      gyro_z.push(data[i].gyro_z);
+      timestamp.push(data[i].timestamp);
+   }
+  //plot the chart
+    var ctx = document.getElementById("gyro_zChart").getContext('2d');
+    var gyro_zChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'gyro-z (°/s)',
+                data: gyro_z,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:false,
+                        stepSize:0.1
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'gyro-z (°/s)'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+//moisture chart
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var moisture = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      moisture.push(data[i].moisture);
+      timestamp.push(data[i].timestamp);
+   }
+  //plot the chart
+    var ctx = document.getElementById("moistureChart").getContext('2d');
+    var moistureChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'moisture (%)',
+                data: moisture,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true,
+                        stepSize:10
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'moisture (%)'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+//vibration chart
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var vibration = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      vibration.push(data[i].vibration);
+      timestamp.push(data[i].timestamp);
+   }
+  //plot the chart
+    var ctx = document.getElementById("vibrationChart").getContext('2d');
+    var vibrationChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'vibration',
+                data: vibration,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:false,
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'vibration'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+//displacement chart
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var displacement = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      displacement.push(data[i].displacement);
+      timestamp.push(data[i].timestamp);
+   }
+  //plot the chart
+    var ctx = document.getElementById("displacementChart").getContext('2d');
+    var displacementChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'displacement (cm)',
+                data: displacement,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true,
+                        stepSize:1
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'displacement (cm)'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+    } //if function end
+
+    $('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+      $(this).val('');
+    });
+
+  }); //apply button end
+
+}); //js function end
+</script>
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/jquery.ui.datepicker.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
+    
+  <!--buat kalender-->
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/themes/sunny/jquery-ui.min.css"></link>
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css"></link>
+    
+
+
+
+
+
+    {% endblock content %}

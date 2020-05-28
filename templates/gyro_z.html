@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+<!-- Begin Page Content -->
+<div class="container-fluid"> 
+<!--gyro z chart-->
+<h2 style="font-weight: bold;">Chart for Gyro-Z data</h2>
+<p>Choose data from date : </p><input style="width: 30%;" type="text" name="datefilter" value="" /></br></br>
+{% for node in sensor_list %} 
+<h4>Node {{ node.name }}</h4>
+<div class="row"> 
+  <div class="col-sm-1"></div>
+    <canvas id="gyro_zChart{{node.node_id}}" width="600" height="300">
+    </canvas>
+    <div class="col-sm-1"></div>
+  </div>    
+{% endfor %}
+</div>
+<!-- end of page content (container-fluid) -->
+
+</div>
+<!-- End of Main Content -->
+
+<!-- Footer -->
+<footer class="sticky-footer bg-white">
+<div class="container my-auto">
+  <div class="copyright text-center my-auto">
+    <span>Copyright &copy; GMLEWS 2019</span>
+  </div>
+</div>
+</footer>
+<!-- End of Footer -->
+
+</div>
+<!-- End of Content Wrapper -->
+
+</div>
+<!-- End of Page Wrapper -->
+
+<!-- Scroll to Top Button-->
+<a class="scroll-to-top rounded" href="#page-top">
+<i class="fas fa-angle-up"></i>
+</a>
+
+<script>
+
+
+  $('input[name="datefilter"]').daterangepicker({
+    showDropdowns: true,
+    autoUpdateInput: false,
+    locale: {
+      cancelLabel: 'Clear'
+    }
+  });
+  {% for node in sensor_list %} 
+  $('input[name="datefilter"]').on('apply.daterangepicker', function(ev, picker) {
+    $(this).val(picker.startDate.format('YYYY-MM-DD') + ' - ' + picker.endDate.format('YYYY-MM-DD'));
+    var startDate = picker.startDate.format('YYYY-MM-DD');
+    var endDate = picker.endDate.format('YYYY-MM-DD');
+    if (startDate != '' && endDate != '') {
+      console.log(startDate, endDate);
+      
+//gyro_z chart
+  $.ajax({
+  method: "GET",
+  url: 'http://127.0.0.1:8000/api/data/?node_id={{ node.node_id }}',
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var gyro_z = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      gyro_z.push(data[i].gyro_z);
+      timestamp.push(data[i].timestamp);
+   }
+   console.log(gyro_z);
+  //plot the chart
+    var ctx = document.getElementById("gyro_zChart{{node.node_id}}").getContext('2d');
+    var gyro_zChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'gyro-z (°/s)',
+                data: gyro_z,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:false,
+                        stepSize:0.1
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'gyro-z (°/s)'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
+} //if function end
+
+$('input[name="datefilter"]').on('cancel.daterangepicker', function(ev, picker) {
+  $(this).val('');
+});
+
+}); //apply button end
+
+
+
+{% endfor %}
+</script>
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.3/dist/Chart.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+      
+
+    {% endblock content %}
+
+    
+

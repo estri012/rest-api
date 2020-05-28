@@ -73,10 +73,23 @@
   
         <!-- Nav Item - Sensors Collapse Menu -->
         <li class="nav-item">
-          <a class="nav-link collapsed" href="/chartnode">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSensor" aria-expanded="true" aria-controls="collapseSensor">
             <i class="fas fa-fw fa-chart-area"></i>
             <span>Sensors Data</span>
           </a>
+          <div id="collapseSensor" class="collapse" aria-labelledby="headingSensor" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <a class="collapse-item" href="/accelero-x">Accelero-X</a>
+              <a class="collapse-item" href="/accelero-y">Accelero-Y</a>
+              <a class="collapse-item" href="/accelero-z">Accelero-Z</a>
+              <a class="collapse-item" href="/gyro-x">Gyro-X</a>
+              <a class="collapse-item" href="/gyro-y">Gyro-Y</a>
+              <a class="collapse-item" href="/gyro-z">Gyro-Z</a>
+              <a class="collapse-item" href="/moisture">Moisture</a>
+              <a class="collapse-item" href="/vibration">Vibration</a>
+              <a class="collapse-item" href="/displacement">Displacement</a>
+            </div>
+          </div>
         </li>
   
         <!-- Divider -->

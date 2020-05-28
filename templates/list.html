@@ -26,7 +26,6 @@
                     <th>Latitude</th>
                     <th>Longitude</th>
                     <th>Location</th>
-                    <th>Address</th>
                 </tr>
             </table>
         </div></br> <!--end kode list table node-->
@@ -72,12 +71,11 @@
                 var node_data = '';
                 $.each(data, function(key, value){
                     node_data += '<tr>';
-                    node_data += '<td>'+value.node_id+'</td>';
-                    node_data += '<td> <a href="/chart/'+value.node_id+'">'+value.name+'</a></td>';
-                    node_data += '<td>'+value.latitude+'</td>';
-                    node_data += '<td>'+value.longitude+'</td>';
-                    node_data += '<td>'+value.location+'</td>';
-                    node_data += '<td>'+value.address+'</td>';
+                    node_data += '<td>'+value.node_id;
+                    node_data += '<td>'+value.name;
+                    node_data += '<td>'+value.latitude;
+                    node_data += '<td>'+value.longitude;
+                    node_data += '<td>'+value.location;
                     node_data += '</tr>';
                 });
                 $('#node_table').append(node_data);
@@ -99,8 +97,6 @@
        let coordinates = [];
        let node_id = [];
        let loc = [];
-       let address = [];
-       let name_node = [];
         
         async function getData(){
           const response = await fetch(api_url);
@@ -109,18 +105,17 @@
             coordinates.push([Number(data[i].latitude), Number(data[i].longitude)]);
             node_id.push(data[i].node_id);
             loc.push(data[i].location);
-            address.push(data[i].address);
-            name_node.push(data[i].name);
           };
+          console.log(coordinates);
+          console.log(node_id);
+          console.log(loc);
 
           //marker
           for (let i=0; i<coordinates.length; i++) {
             L.marker(coordinates[i]).addTo(map)
-            .bindPopup("<b>Node Id:</b> " + node_id[i] + "</br>" +
-            "<b>Name node:</b> "+ name_node[i] + "</br>" +
-            "<b>Latitude:</b> " + coordinates[i][0] + "</br>" + 
+            .bindPopup("<b>Latitude:</b> " + coordinates[i][0] +"</br>" + 
             "<b>Longitude:</b> " + coordinates[i][1] + "</br>" + 
-            "<b>Address:</b> "+ address[i]);
+            "<b>Node Id:</b> " + node_id[i]);
           };
           
         };

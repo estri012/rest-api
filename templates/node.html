@@ -14,11 +14,15 @@
         <!-- Begin Page Content -->
         <div class="container-fluid">
 
-      <form id="form_id" method="POST" action="https://gmlews.com/api/node/">
+      <form id="form_id" target="_blank" method="POST" action="http://127.0.0.1:8000/api/node/">
          <h1>Add Node</h1>
-         <h4>Node ID*</h4>
+         <h4>Node Id*</h4>
          <div class="node_id">
-            <input type="text" name="node_id" placeholder="node id" id="node_id" required />
+            <input type="text" name="node_id" placeholder="node_id" id="node_id" required />
+         </div></br>
+         <h4>Node Name*</h4>
+         <div class="name">
+            <input type="text" name="name" placeholder="name" id="name" required />
          </div>
          <h1>Get the latitude and longitude of the node</h1>
          <div class="latitude">
@@ -34,10 +38,12 @@
           height: 350px; }
         </style>
         <div id="node1Map"></div>
-        <h4>Location Address</h4>
-        <input type="text" id="location" name="location" />       
+        <h4>Location</h4>
+        <input type="text" id="location" name="location" /></br>
+        <h4>Address</h4>
+        <input type="text" id="address" name="address" />        
         <div class="btn-block">
-          <button type="submit" href="/">Submit</button>
+          <button type="submit" href="/">Create</button>
         </div>
       </form>
 
@@ -67,6 +73,21 @@
     
   
   });
+
+
+//generate last node_id
+            const api_url = 'http://127.0.0.1:8000/api/node/'
+            var last_id=[];
+            async function getData(){
+                const response = await fetch(api_url);
+                const data = await response.json();
+                last_id.push(data[data.length-1].node_id)
+                console.log(last_id);
+                var get_id=last_id++;
+                console.log(last_id);
+                document.getElementById('node_id').value = last_id;
+            }         
+            getData();
 
   </script>
 

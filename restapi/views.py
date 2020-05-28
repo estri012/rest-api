@@ -1,5 +1,6 @@
 import json
 from django.views.generic import View
+from django.http import Http404
 from django.shortcuts import render
 from rest_framework import routers, serializers, viewsets
 from rest_framework.response import Response
@@ -32,15 +33,71 @@ class Map(View):
 class TambahNode(View):
     def get(self, request, *args, **kwargs):
         return render(request, 'node.html')
+        
 
+def list(request):
+    list_node = Node.objects.order_by('node_id')
+    context = {'list_node': list_node}
+    return render(request, 'list.html', context)
 
+def shownode(request, node_node_id):
+    try:
+        node = Node.objects.get(pk=node_node_id)
+    except Node.DoesNotExist:
+        raise Http404("Node does not exist")
+    return render(request, 'chartbaru.html', {'node': node})
+
+def accelero_x(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'accelero_x.html', context)
+
+def accelero_y(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'accelero_y.html', context)
+
+def accelero_z(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'accelero_z.html', context)
+
+def gyro_x(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'gyro_x.html', context)
+
+def gyro_y(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'gyro_y.html', context)
+
+def gyro_z(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'gyro_z.html', context)
+
+def moisture(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'moisture.html', context)
+
+def vibration(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'vibration.html', context)
+
+def displacement(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'displacement.html', context)
 
 
 class DataViewSet(viewsets.ModelViewSet):
         queryset = Data.objects.all()
         serializer_class = DataSerializer
         filter_backends = [DjangoFilterBackend]
-        filterset_fields = ['node_id', 'timestamp']
+        filterset_fields = ['node_id']
 
 
 class MapView(viewsets.ModelViewSet):
