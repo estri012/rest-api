@@ -16,6 +16,9 @@ class Data(models.Model):
     accelero_y = models.FloatField()
     accelero_z = models.FloatField()
     displacement = models.IntegerField()
+    angular = models.FloatField()
+    class Meta:
+        ordering = ["id"]
 
 
 class Node(models.Model):

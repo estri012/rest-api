@@ -36,9 +36,24 @@ class TambahNode(View):
         
 
 def list(request):
-    list_node = Node.objects.order_by('node_id')
-    context = {'list_node': list_node}
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
     return render(request, 'list.html', context)
+
+def addnode(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'node.html', context)
+
+def base(request):
+    sensor_list = Node.objects.order_by('node_name')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'base.html', context)
+
+def chartsensor(request):
+    sensor_list = Node.objects.order_by('node_name')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'chartbaru.html', context)
 
 def shownode(request, node_node_id):
     try:
@@ -91,6 +106,12 @@ def displacement(request):
     sensor_list = Node.objects.order_by('node_id')
     context = {'sensor_list': sensor_list}
     return render(request, 'displacement.html', context)
+
+def angular(request):
+    sensor_list = Node.objects.order_by('node_id')
+    context = {'sensor_list': sensor_list}
+    return render(request, 'angular.html', context)
+
 
 
 class DataViewSet(viewsets.ModelViewSet):

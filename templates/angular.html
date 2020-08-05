@@ -7,14 +7,14 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 <!-- Begin Page Content -->
 <div class="container-fluid"> 
-<!--accelero x chart-->
-<h2 style="font-weight: bold;">Chart for Accelero-X data</h2>
+<!--angular chart-->
+<h2 style="font-weight: bold;">Chart for Angular data</h2>
 <p>Choose data from date : </p><input style="width: 30%;" type="text" name="datefilter" value="" /></br></br>
 {% for node in sensor_list %} 
 <h4>Node {{ node.name }}</h4>
 <div class="row"> 
   <div class="col-sm-1"></div>
-    <canvas id="accelero_xChart{{node.node_id}}" width="600" height="300">
+    <canvas id="angularChart{{node.node_id}}" width="600" height="300">
     </canvas>
     <div class="col-sm-1"></div>
   </div>    
@@ -64,7 +64,7 @@
     if (startDate != '' && endDate != '') {
       console.log(startDate, endDate);
       
-//accelero_x chart
+//angular chart
   $.ajax({
   method: "GET",
   url: 'http://127.0.0.1:8000/api/data/?node_id={{ node.node_id }}',
@@ -74,31 +74,30 @@
   },
   success: function(data){
     //get data by fields
-    var accelero_x = [], timestamp = [];
+    var angular = [], timestamp = [];
     for (var i=0; i<data.length; i++){
-      accelero_x.push(data[i].accelero_x);
+      angular.push(data[i].angular);
       timestamp.push(data[i].timestamp);
    }
-   console.log(accelero_x);
+   console.log(angular);
   //plot the chart
-    var ctx = document.getElementById("accelero_xChart{{node.node_id}}").getContext('2d');
-    var accelero_xChart = new Chart(ctx, {
+    var ctx = document.getElementById("angularChart{{node.node_id}}").getContext('2d');
+    var angularChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: timestamp,
             datasets: [{
-                label: 'accelero-x (mV/g)',
-                data: accelero_x,
+                label: 'angular (degree)',
+                data: angular,
                 backgroundColor: [
-                'rgb(68, 145, 252)'
+                    '#ff000000'
                 ],
                 borderColor: [
                 '#331698'
                 ],
                 pointBackgroundColor: '#331698',
-                /* pointStyle: 'circle', */
                 borderCapStyle: 'round',
-                borderWidth: 1
+                borderWidth: 3
             }]
         },
         options: {
@@ -111,20 +110,14 @@
                     },
                       scaleLabel: {
                       display:     true,
-                      labelString: 'accelero-x (mV/g)'
+                      labelString: 'angular (degree)'
                   }
                 }],
                 xAxes: [{
                  
                         display: true,
                         type: "time",
-                        ticks : {
-                          maxTicksLimit:24,
-                        },
                         time: {
-                              displayFormats: {
-                                'day': 'MMM DD',
-                              },
                               min: moment(startDate).toDate(),//Date object type
                               max: moment(endDate).toDate()//Date object type
                         },

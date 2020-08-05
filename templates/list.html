@@ -72,7 +72,7 @@
                 $.each(data, function(key, value){
                     node_data += '<tr>';
                     node_data += '<td>'+value.node_id;
-                    node_data += '<td>'+value.name;
+                    node_data += '<td> <a href="/chart/'+value.node_id+'">'+value.name+'</a></td>';
                     node_data += '<td>'+value.latitude;
                     node_data += '<td>'+value.longitude;
                     node_data += '<td>'+value.location;

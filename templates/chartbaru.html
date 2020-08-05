@@ -11,11 +11,36 @@
 
         <!-- Begin Page Content -->
         <div class="container-fluid">
+<div>Choose Node Device</div>
+  <select id="nodelist" onchange="location=this.value;">
+    <option class="nav-link collapse" value="">{{node.name}}</option>
+  </select> <br><br>  
+<script>
+  $(document).ready(function() {
+    $.getJSON("http://127.0.0.1:8000/api/node/", function(data){
+      var node_id = [], name = []
+      for(var i=0; i<data.length; i++){
+        node_id.push(data[i].node_id);
+        name.push(data[i].name);
+
+        $("#nodelist").append("<option value='/chart/"+node_id[i]+"'>"+name[i]+"</option>");
+      }
+      console.log(name);
+    });
+  })
+</script>
+
+
+
+
+
+
+
 <h2>Node Id : {{ node.node_id }}, Node Name : {{ node.name }}</h2>
   <p>Choose data from date : </p><input style="width: 30%;" type="text" name="datefilter" value="" />
 <p>Choose the date then Click this button to download data from {{ node.name }}</p>
 <div>
-  <button id="button1" type="button" class="button"><span>Prepare download</span></button>
+  <button id="button1" type="button" class="button"><span>Download</span></button>
 </div></br></br>
 <!--accelero x chart-->
 <div class="row">
@@ -97,6 +122,15 @@
     </canvas>
     <div class="col-sm-1"></div>
     </div>
+<!--angular chart-->
+</br></br></br>
+<div class="row"> 
+  <h5 style="font-weight: bold;">Angular Chart</h5>
+  <div class="col-sm-1"></div>
+    <canvas id="angularChart" width="600" height="300">
+    </canvas>
+    <div class="col-sm-1"></div>
+    </div>
     
 
   </div>
@@ -129,7 +163,7 @@
 
 
 <script>
-  let filteredData;
+let filteredData;
 const ConvertToCSV = data => {
   if (!data || data.length === 0) { 
     console.log("data was empty");
@@ -138,16 +172,15 @@ const ConvertToCSV = data => {
   let csv = [Object.keys(data[0]).slice(0).join(",")];
   data.forEach(
     item => csv.push(
-      Object.values(item).join(",")
+      Object.values(item).map(val => isNaN(val) ? '"'+val+'"':val).join(",")
     )
   )
   csv=csv.join("\n");
   console.log(csv);
   const $link = $('<a/>',{ href: "data:text/csv;charset=utf-8,"+escape(csv), download:"download_data_{{ node.name }}.csv",text:"download"});
-  
-  $('#button1').after($link)
-  $link.click();
-}; //ConvertToCSV end
+ 
+  $link[0].click(); // trigger native click
+};
 $(function() {
 
   $('input[name="datefilter"]').daterangepicker({
@@ -161,7 +194,7 @@ $(function() {
   // Convert JSON to CSV & Display CSV
   $('#button1').on("click", function() {
     if (filteredData) ConvertToCSV(filteredData)
-    else alert("Please choose the date first");
+    else alert("Please get data first");
   }).prop("disabled", true);
 
 
@@ -171,7 +204,7 @@ $(function() {
     var endDate = picker.endDate.format('YYYY-MM-DD');
     if (startDate != '' && endDate != '') {
       console.log(startDate, endDate);
-      var endpoint = "http://127.0.0.1:8000/api/data/?node_id={{ node.node_id }}";
+      var endpoint = '"http://127.0.0.1:8000/api/data/?node_id={{ node.node_id }}"';
 
       $.ajax({
         method: "GET",
@@ -181,12 +214,13 @@ $(function() {
           endDate: endDate
         },
         success: function(data) {
-          //get filtered data for CSV
           filteredData = data.filter(item => item.timestamp > startDate && item.timestamp < endDate)
-          console.log(filteredData);
-           $('#button1').prop("disabled",false); //download button on
+           console.log(filteredData);
+           $('#button1').prop("disabled",false);
         } //function(data)end
       }) //ajax end
+
+
 //accelero_x chart
   $.ajax({
   method: "GET",
@@ -311,20 +345,19 @@ $.ajax({
                         display: true,
                         type: "time",
                         time: {
-                              minUnit: "hour",
-                              unit: "hour",
-                              unitStepSize: 6,
                               min: moment(startDate).toDate(),//Date object type
-                              max: moment(endDate).toDate()//Date object type
+                              max: moment(endDate).toDate(),//Date object type   
                         },
+                        gridLines: {display: false},
                       scaleLabel: {
                       display:     true,
                       labelString: 'Time (hour)'
                   }
                 }]
+            
             }
         }
-    });
+    }); if ((moment(endDate).toDate()-moment(startDate).toDate)> (1000*60*60*24*2)) {console.log("jadi");}
   },
   error: function(error_data){
     console.log(error_data)
@@ -848,6 +881,81 @@ $.ajax({
   } 
 
 });
+
+//displacement chart
+$.ajax({
+  method: "GET",
+  url: endpoint,
+  data: {
+    startDate: startDate,
+    endDate: endDate
+  },
+  success: function(data){
+    //get data by fields
+    var angular = [], timestamp = [];
+    for (var i=0; i<data.length; i++){
+      angular.push(data[i].angular);
+      timestamp.push(data[i].timestamp);
+   }
+  //plot the chart
+    var ctx = document.getElementById("angularChart").getContext('2d');
+    var angularChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: timestamp,
+            datasets: [{
+                label: 'angular (degree)',
+                data: angular,
+                backgroundColor: [
+                    '#ff000000'
+                ],
+                borderColor: [
+                '#331698'
+                ],
+                pointBackgroundColor: '#331698',
+                borderCapStyle: 'round',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            reponsive: true,
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero:true,
+                        stepSize:1
+                    },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'angular (degree)'
+                  }
+                }],
+                xAxes: [{
+                 
+                        display: true,
+                        type: "time",
+                        time: {
+                              minUnit: "hour",
+                              unit: "hour",
+                              unitStepSize: 6,
+                              min: moment(startDate).toDate(),//Date object type
+                              max: moment(endDate).toDate()//Date object type
+                        },
+                      scaleLabel: {
+                      display:     true,
+                      labelString: 'Time (hour)'
+                  }
+                }]
+            }
+        }
+    });
+  },
+  error: function(error_data){
+    console.log(error_data)
+  } 
+
+});
+
 
     } //if function end
 
