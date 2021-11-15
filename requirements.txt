@@ -9,7 +9,7 @@ gunicorn==20.0.4
 httplib2==0.17.0    
 idna==2.9       
 Markdown==3.2.1     
-pip==20.0.2    
+pip==21.1    
 post==2019.4.13 
 psycopg2==2.8.4     
 public==2019.4.13 
